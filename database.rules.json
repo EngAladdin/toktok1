@@ -1,0 +1,107 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "places": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.admin === true",
+      "$name": {
+        ".validate": "$name.length >= 1 && $name.length <= 40 && newData.hasChildren(['lat', 'lng'])",
+        "lat": { ".validate": "newData.isNumber() && newData.val() >= 29 && newData.val() <= 32" },
+        "lng": { ".validate": "newData.isNumber() && newData.val() >= 29 && newData.val() <= 32" },
+        "img": { ".validate": "newData.isString() && newData.val().length <= 300 && newData.val().beginsWith('https://')" },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "routes": {
+      ".read": "auth != null",
+      ".write": "auth != null && auth.token.admin === true",
+      "$key": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 1000" }
+    },
+
+    "drivers": {
+      ".read": "auth != null && auth.token.admin === true",
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "name": {
+          ".write": "auth != null && auth.uid === $uid",
+          ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30"
+        },
+        "approved": {
+          ".write": "auth != null && auth.token.admin === true",
+          ".validate": "newData.isBoolean()"
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "trips": {
+      ".indexOn": ["status", "driverId", "publishedAt"],
+      ".read": "auth != null && (auth.token.admin === true || root.child('drivers').child(auth.uid).child('approved').val() === true)",
+      "$tripId": {
+        ".read": "auth != null && auth.uid === $tripId",
+        ".write": "auth != null && (auth.uid === $tripId || auth.token.admin === true)",
+        ".validate": "newData.hasChildren(['riderId', 'gender', 'count', 'dest', 'from', 'price', 'status', 'publishedAt'])",
+
+        "riderId": { ".validate": "newData.val() === $tripId" },
+        "gender": { ".validate": "newData.val() === 'ذكر' || newData.val() === 'أنثى'" },
+        "count": { ".validate": "newData.val() === '1' || newData.val() === '2' || newData.val() === 'أكثر من 2'" },
+        "dest": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40" },
+        "from": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 40" },
+        "price": { ".validate": "newData.isNumber() && newData.val() >= 10 && newData.val() <= 1000" },
+        "publishedAt": { ".validate": "newData.isNumber()" },
+        "lat": { ".validate": "newData.isNumber() && newData.val() >= 29 && newData.val() <= 32" },
+        "lng": { ".validate": "newData.isNumber() && newData.val() >= 29 && newData.val() <= 32" },
+        "arrivedRider": { ".validate": "newData.isBoolean()" },
+
+        "status": {
+          ".validate": "newData.val() === 'waiting' || newData.val() === 'picked' || newData.val() === 'done'",
+          ".write": "auth != null && root.child('drivers').child(auth.uid).child('approved').val() === true && newData.parent().child('driverId').val() === auth.uid"
+        },
+        "driverId": {
+          ".validate": "newData.isString() && (newData.val() === auth.uid || newData.parent().child('offers').child(newData.val()).exists())",
+          ".write": "auth != null && root.child('drivers').child(auth.uid).child('approved').val() === true && !data.exists() && newData.val() === auth.uid"
+        },
+        "driverName": {
+          ".validate": "newData.isString() && newData.val().length <= 30",
+          ".write": "auth != null && root.child('drivers').child(auth.uid).child('approved').val() === true && newData.parent().child('driverId').val() === auth.uid"
+        },
+        "seatsTaken": {
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2",
+          ".write": "auth != null && root.child('drivers').child(auth.uid).child('approved').val() === true && newData.parent().child('driverId').val() === auth.uid"
+        },
+        "arrivedDriver": {
+          ".validate": "newData.isBoolean()",
+          ".write": "auth != null && root.child('drivers').child(auth.uid).child('approved').val() === true && newData.parent().child('driverId').val() === auth.uid"
+        },
+        "offers": {
+          "$driverId": {
+            ".write": "auth != null && auth.uid === $driverId && root.child('drivers').child(auth.uid).child('approved').val() === true",
+            ".validate": "newData.hasChildren(['name', 'message'])",
+            "name": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 30" },
+            "message": { ".validate": "newData.isString() && newData.val().length <= 60" },
+            "$other": { ".validate": false }
+          }
+        },
+        "$other": { ".validate": false }
+      }
+    },
+
+    "history": {
+      ".read": "auth != null && auth.token.admin === true",
+      "$id": {
+        ".write": "auth != null && (auth.token.admin === true || (!data.exists() && newData.child('driverId').val() === auth.uid && root.child('drivers').child(auth.uid).child('approved').val() === true))",
+        ".validate": "newData.hasChildren(['riderId', 'driverId', 'from', 'to', 'price', 'at'])",
+        "riderId": { ".validate": "newData.isString()" },
+        "driverId": { ".validate": "newData.isString()" },
+        "from": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "to": { ".validate": "newData.isString() && newData.val().length <= 40" },
+        "price": { ".validate": "newData.isNumber()" },
+        "at": { ".validate": "newData.isNumber()" },
+        "$other": { ".validate": false }
+      }
+    }
+  }
+}

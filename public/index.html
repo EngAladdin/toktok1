@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>توكتوك النوبارية</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="app.js" defer></script>
+</head>
+<body>
+<div class="container">
+
+<div id="home" class="screen">
+  <div class="logo">
+    <div class="mark">🛺</div>
+    <h1>توكتوك النوبارية</h1>
+    <p class="small">خدمة توصيل التكتوك بمدينة النوبارية – البحيرة</p>
+  </div>
+  <div class="trial">
+    ⚠️ هذه نسخة تجريبية حتى الآن، ولسنا مسؤولين عن أي أخطاء في التطبيق أو سوء تعامل من الراكب للسائق أو العكس.<br>
+    قريبًا: خدمة مدفوعة أكثر تنظيمًا وبمقابل مادي بسيط.<br>
+    <a class="link-yellow" href="SUBSCRIPTION_LINK">📋 خطط الاشتراك</a>
+  </div>
+  <button type="button" class="btn btn-yellow" data-action="show" data-arg="screen-role">🛺 أنا سائق توكتوك</button>
+  <button type="button" class="btn btn-green" data-action="show" data-arg="screen-rider">🧍 أنا راكب</button>
+  <button type="button" class="btn btn-outline" data-action="show" data-arg="screen-complaint">📢 شكوى أو اقتراح</button>
+  <div class="socials">
+    <a class="wa" href="https://chat.whatsapp.com/XXXX" rel="noopener noreferrer">واتساب</a>
+    <a class="tg" href="https://t.me/XXXX" rel="noopener noreferrer">تليجرام</a>
+    <a class="fb" href="https://facebook.com/XXXX" rel="noopener noreferrer">فيسبوك</a>
+  </div>
+  <p class="small center">حساب شكاوى واتساب: 01044231351</p>
+</div>
+
+<div id="screen-rider" class="screen hidden">
+  <div class="topbar"><span>🧍 لوحة الراكب</span><span class="uid" id="riderUid"></span></div>
+  <h2>املأ بيانات رحلتك</h2>
+  <div class="card">
+    <label for="rGender">النوع</label>
+    <select id="rGender"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
+    <label for="rCount">عدد الركاب</label>
+    <select id="rCount"><option value="1">1</option><option value="2">2</option><option value="أكثر من 2">أكثر من 2</option></select>
+    <label for="rDest">المكان الذي تريد الذهاب إليه</label>
+    <select id="rDest"></select>
+    <label for="rFrom">من أين ستلحق التوكتوك؟</label>
+    <select id="rFrom"></select>
+    <label for="rPrice">السعر المقترح (التعريفة الثابتة 10 جنيه)</label>
+    <input type="number" id="rPrice" value="10" min="10" max="1000" step="0.5">
+    <button type="button" class="btn btn-green" data-action="publishTrip">🚀 نشر الرحلة لسائقي التوكتوك</button>
+    <div id="geoWarn" class="geo-warn hidden">📍 سنجدك على إحداثيات المكان المحدد (لم يُسمح بموقعك الحقيقي)</div>
+    <p class="small">موقعك يُحفظ تقريبيًا (بدقة نحو 100 متر) ويُحذف مع انتهاء الرحلة.</p>
+  </div>
+
+  <div id="riderActive" class="hidden">
+    <h3>رحلتك الحالية</h3>
+    <div class="card" id="riderTripCard"></div>
+    <h3>سائقو التوكتوك المثابرون عليك (اختر واحد)</h3>
+    <div class="offers" id="riderOffers"></div>
+    <button type="button" class="btn btn-green" data-action="riderArrive">✅ تم الوصول بسلام</button>
+    <button type="button" class="btn btn-red" data-action="cancelTrip">❌ إلغاء الرحلة</button>
+  </div>
+  <button type="button" class="btn btn-gray" data-action="show" data-arg="home">⬅ رجوع</button>
+</div>
+
+<div id="screen-role" class="screen hidden">
+  <div class="topbar"><span>🛺 لوحة السائق</span><span class="uid" id="driverUid"></span></div>
+  <div class="card">
+    <label for="driverName">علامة توكتوك (اسمك كما يظهر للركاب)</label>
+    <input type="text" id="driverName" maxlength="30" placeholder="مثال: السواحلي 1">
+    <button type="button" class="btn btn-yellow" data-action="saveDriver">💾 حفظ / تحديث بياناتي</button>
+    <p class="pid" id="driverPid"></p>
+    <p class="small" id="driverApproval"></p>
+  </div>
+
+  <h2>🗺️ خريطة الركاب المنتظرين (النوبارية)</h2>
+  <div id="map"></div>
+
+  <div class="card">
+    <label>ركاب بانتظار توكتوك الآن</label>
+    <div id="driverTrips"></div>
+  </div>
+
+  <div id="driverActive" class="hidden">
+    <h3>رحلتك الحالية</h3>
+    <div class="card" id="driverTripCard"></div>
+    <div class="seats" id="seatsBar"></div>
+    <button type="button" class="btn btn-yellow" data-action="pickUpPassenger">🚦 التقط الراكب (لو انتظرته وركب)</button>
+    <button type="button" class="btn btn-green" data-action="driverArrive">✅ تم الوصول بسلام</button>
+  </div>
+
+  <div class="card">
+    <button type="button" class="btn btn-outline" data-action="toggleAdmin">🔧 وضع الأدمن</button>
+    <div id="adminPanel" class="hidden">
+      <div id="adminLogin">
+        <label for="admEmail">البريد الإلكتروني للأدمن</label>
+        <input type="email" id="admEmail" autocomplete="username">
+        <label for="admPass">كلمة المرور</label>
+        <input type="password" id="admPass" autocomplete="current-password">
+        <button type="button" class="btn btn-blue" data-action="adminLogin">🔐 دخول الأدمن</button>
+      </div>
+      <div id="adminTools" class="hidden">
+        <h3>السائقون</h3>
+        <div id="adminDrivers"></div>
+        <h3>الأماكن</h3>
+        <label for="admName">اسم المكان الجديد</label>
+        <input type="text" id="admName" maxlength="40" placeholder="مثال: الأسيوطي">
+        <label for="admLat">خط العرض</label><input type="text" id="admLat" inputmode="decimal" placeholder="30.9...">
+        <label for="admLng">خط الطول</label><input type="text" id="admLng" inputmode="decimal" placeholder="30.4...">
+        <label for="admImg">رابط صورة المكان (https فقط، اختياري)</label><input type="text" id="admImg">
+        <button type="button" class="btn btn-blue" data-action="addPlace">➕ إضافة مكان للخريطة</button>
+        <button type="button" class="btn btn-gray" data-action="seedPlaces">📥 تحميل الأماكن الافتراضية</button>
+        <h3>الأسعار</h3>
+        <label for="admFrom">تعديل سعر مسار ثابت: من</label>
+        <select id="admFrom"></select>
+        <label for="admTo">إلى</label>
+        <select id="admTo"></select>
+        <label for="admRoutePrice">السعر</label><input type="number" id="admRoutePrice" value="10" min="1" max="1000">
+        <button type="button" class="btn btn-blue" data-action="setRoutePrice">💾 حفظ سعر المسار</button>
+        <button type="button" class="btn btn-red" data-action="adminLogout">🚪 خروج الأدمن</button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="btn btn-gray" data-action="show" data-arg="home">⬅ رجوع</button>
+</div>
+
+<div id="screen-complaint" class="screen hidden">
+  <h2>📢 شكوى أو اقتراح</h2>
+  <div class="card">
+    <p>سيتم توجيهك لحساب واتساب الشكاوى مباشرة.</p>
+    <a class="btn btn-green" rel="noopener noreferrer" href="https://wa.me/201044231351?text=أريد%20تقديم%20شكوى%20بخصوص%20توكتوك%20النوبارية">💬 فتح واتساب (01044231351)</a>
+  </div>
+  <button type="button" class="btn btn-gray" data-action="show" data-arg="home">⬅ رجوع</button>
+</div>
+
+</div>
+</body>
+</html>

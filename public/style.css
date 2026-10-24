@@ -1,0 +1,47 @@
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,sans-serif}
+body{background:#0f172a;color:#f1f5f9;min-height:100vh}
+.container{max-width:600px;margin:0 auto;padding:16px}
+.hidden{display:none!important}
+.logo{text-align:center;padding:20px 0}
+.logo .mark{font-size:64px}
+.logo h1{color:#fbbf24;font-size:28px;margin-top:8px}
+.btn{display:block;width:100%;padding:16px;margin:10px 0;border:none;border-radius:14px;font-size:18px;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none;color:#fff;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn-yellow{background:#f59e0b;color:#1e293b}
+.btn-green{background:#22c55e}
+.btn-blue{background:#3b82f6}
+.btn-red{background:#ef4444}
+.btn-gray{background:#475569}
+.btn-outline{background:transparent;border:2px solid #f59e0b;color:#f59e0b}
+.screen{padding:16px 0}
+.screen h2{color:#fbbf24;margin-bottom:12px;text-align:center}
+.card{background:#1e293b;border-radius:14px;padding:16px;margin:10px 0;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+label{display:block;margin:10px 0 4px;color:#94a3b8;font-size:14px}
+select,input[type=text],input[type=number]{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#f1f5f9;font-size:16px}
+.trial{background:#7c2d12;color:#fed7aa;padding:10px;border-radius:10px;font-size:13px;text-align:center;margin:10px 0;line-height:1.6}
+.socials{display:flex;gap:8px;justify-content:center;margin:16px 0;flex-wrap:wrap}
+.socials a{padding:10px 16px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:bold;color:#fff}
+.wa{background:#25d366}.tg{background:#0088cc}.fb{background:#1877f2}
+.trip-item{background:#1e293b;border-radius:14px;padding:14px;margin:10px 0;border-right:4px solid #f59e0b}
+.trip-item .info{font-size:15px;line-height:1.9}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:bold;margin-left:6px}
+.b-male{background:#1d4ed8}.b-female{background:#be185d}
+.seats{display:flex;gap:6px;align-items:center;font-size:20px;margin:8px 0}
+.dot{width:22px;height:22px;border-radius:50%;background:#334155;display:inline-block}
+.dot.full{background:#22c55e}
+#map{height:420px;border-radius:14px;margin:10px 0;z-index:0}
+.price{color:#fbbf24;font-weight:bold;font-size:18px}
+.small{font-size:12px;color:#94a3b8}
+.offers .offer{border:1px solid #334155;border-radius:10px;padding:10px;margin:8px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center;background:#1e293b;padding:10px 14px;border-radius:12px;margin-bottom:10px}
+.topbar .uid{color:#fbbf24;font-size:13px}
+.pid{color:#22c55e;font-size:13px;margin-top:4px;direction:ltr}
+h3{color:#fbbf24;margin:14px 0 6px}
+.geo-warn{background:#450a0a;color:#fecaca;padding:8px;border-radius:8px;font-size:12px;text-align:center}
+input[type=email],input[type=password]{width:100%;padding:12px;border-radius:10px;border:1px solid #334155;background:#0f172a;color:#f1f5f9;font-size:16px;direction:ltr}
+.btn-sm{padding:8px;margin-top:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.link-yellow{color:#fbbf24}
+.center{text-align:center}
+.actions{margin-top:8px}
+.drv-row{border:1px solid #334155;border-radius:10px;padding:10px;margin:8px 0;font-size:14px;line-height:1.8}
